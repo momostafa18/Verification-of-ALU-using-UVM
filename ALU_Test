@@ -1,0 +1,44 @@
+class ALU_Test extends uvm_test;
+  
+  ALU_Enviroment alu_enviroment ;
+  ALU_Sequence   alu_sequence ;
+  virtual ALU_if intf1 ;
+  
+  // Factory Registration
+  `uvm_component_utils(ALU_Test)
+  
+  //Factory Construction
+  function new (string name = "ALU_Test" , uvm_component parent = null);
+       super.new(name,parent);
+    endfunction
+    
+   //UVM Phases
+  function void build_phase(uvm_phase phase);
+      super.build_phase(phase);
+    `uvm_info ("Test" ,"We_Are_Now_In_Test_Build_Phase",UVM_NONE)
+    // Factory Creation
+    alu_enviroment= ALU_Enviroment::type_id::create("alu_enviroment",this);
+    alu_sequence= ALU_Sequence::type_id::create("alu_sequence");
+    
+    //DataBase configurations
+    if(!(uvm_config_db#(virtual ALU_if)::get(this,"","alu_VIF",intf1)))
+      `uvm_fatal(get_full_name(),"Error")
+       
+    uvm_config_db #(virtual ALU_if)::set(this,"ALU_Enviroment","alu_VIF",intf1);
+
+    endfunction
+    
+  function void connect_phase(uvm_phase phase);
+      super.connect_phase(phase);
+    `uvm_info ("Test" ,"We_Are_Now_In_Test_Connect_Phase",UVM_NONE)
+    endfunction
+    
+  task run_phase(uvm_phase phase);
+      super.run_phase(phase);
+    `uvm_info ("Test" ,"We_Are_Now_In_Test_Run_Phase",UVM_NONE)
+     phase.raise_objection(this,"Starting Sequence");
+     alu_sequence.start(alu_enviroment.alu_agent.alu_sequencer);
+     phase.drop_objection(this,"Finished Sequence");
+    endtask
+    
+    endclass
