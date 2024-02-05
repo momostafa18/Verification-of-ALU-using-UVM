@@ -1,0 +1,55 @@
+class ALU_Driver extends uvm_driver #(ALU_Sequence_Item);
+  
+  ALU_Sequence_Item First_Seq;
+  virtual ALU_if intf1 ;
+
+  
+  // Factory Registration
+  `uvm_component_utils(ALU_Driver)
+  
+  //Factory Construction
+  function new (string name = "ALU_Driver" , uvm_component parent = null);
+       super.new(name,parent);
+  endfunction
+    
+   //UVM Phases
+  function void build_phase(uvm_phase phase);
+      super.build_phase(phase);
+    `uvm_info ("Driver" ,"We_Are_Now_In_Driver_Build_Phase",UVM_NONE)
+      // Factory Creation
+      First_Seq = ALU_Sequence_Item::type_id::create("First_Seq");
+    
+    //DataBase configurations
+    if(!(uvm_config_db#(virtual ALU_if)::get(this,"","alu_VIF",intf1)))
+      `uvm_fatal(get_full_name(),"Error")
+      
+    endfunction
+    
+  function void connect_phase(uvm_phase phase);
+      super.connect_phase(phase);
+    `uvm_info ("Driver" ,"We_Are_Now_In_Driver_Connect_Phase",UVM_NONE)
+    endfunction
+    
+  task run_phase(uvm_phase phase);
+      super.run_phase(phase);
+    `uvm_info ("Driver" ,"We_Are_Now_In_Driver_Run_Phase",UVM_NONE)
+    forever 
+      begin
+        seq_item_port.get_next_item(First_Seq);
+
+        @ (negedge intf1.clk)
+        	  begin
+              intf1.Src_A 			  <= First_Seq.Src_A;
+              intf1.Src_B 			  <= First_Seq.Src_B;
+              intf1.ALU_Control 	  <= First_Seq.ALU_Control;
+              intf1.reset 			  <= First_Seq.reset;
+               /* $display("We are in Driver");
+                $display (intf1.Src_A);
+                $display(intf1.Src_B);*/
+              end
+              #1;
+          seq_item_port.item_done();
+      end
+
+  endtask
+    endclass 
