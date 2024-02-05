@@ -1,0 +1,46 @@
+class ALU_Enviroment extends uvm_env;
+  
+    ALU_Agent 		alu_agent;
+  	ALU_Scoreboard	alu_scoreboard;
+    ALU_Subscriber	alu_subscriber;
+  	virtual ALU_if intf1 ;
+  
+  
+  // Factory Registration
+  `uvm_component_utils(ALU_Enviroment)
+  
+  //Factory Construction
+  function new (string name = "ALU_Enviroment",uvm_component parent = null);
+       super.new(name,parent);
+    endfunction
+    
+   //UVM Phases
+  function void build_phase(uvm_phase phase);
+      super.build_phase(phase);
+    `uvm_info ("Enviroment" ,"We_Are_Now_In_Enviroment_Build_Phase",UVM_NONE)
+    // Factory Creation
+    alu_agent = ALU_Agent::type_id::create("alu_agent",this);
+    alu_scoreboard= ALU_Scoreboard::type_id::create("alu_scoreboard",this);
+    alu_subscriber= ALU_Subscriber::type_id::create("alu_subscriber",this);
+    
+    //DataBase configurations
+    if(!(uvm_config_db#(virtual ALU_if)::get(this,"","alu_VIF",intf1)))
+      `uvm_fatal(get_full_name(),"Error")
+       
+      uvm_config_db #(virtual ALU_if)::set(this,"ALU_Agent","alu_VIF",intf1);
+
+    endfunction
+    
+  function void connect_phase(uvm_phase phase);
+      super.connect_phase(phase);
+    `uvm_info ("Enviroment" ,"We_Are_Now_In_Enviroment_Connect_Phase",UVM_NONE)
+    alu_agent.M_write_port.connect(alu_scoreboard.S_write_exp);
+    alu_agent.M_write_port.connect(alu_subscriber.analysis_export);
+    endfunction
+    
+  task run_phase(uvm_phase phase);
+      super.run_phase(phase);
+    `uvm_info ("Enviroment" ,"We_Are_Now_In_Enviroment_Run_Phase",UVM_NONE)
+    endtask
+    
+    endclass
