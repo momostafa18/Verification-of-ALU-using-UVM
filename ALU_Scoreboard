@@ -1,0 +1,164 @@
+class ALU_Scoreboard extends uvm_scoreboard;
+  
+   ALU_Sequence_Item First_Seq;
+  
+   uvm_analysis_export #(ALU_Sequence_Item) S_write_exp; 
+  
+   uvm_tlm_analysis_fifo#(ALU_Sequence_Item) m_tlm_fifo;
+  // Factory Registration
+  `uvm_component_utils(ALU_Scoreboard)
+  
+  //Factory Construction
+  function new (string name = "ALU_Scoreboard" , uvm_component parent = null);
+       super.new(name,parent);
+    endfunction
+    
+   //UVM Phases
+  function void build_phase(uvm_phase phase);
+      super.build_phase(phase);
+    `uvm_info ("Scoreboard" ,"We_Are_Now_In_Scoreboard_Build_Phase",UVM_NONE)
+    // Factory Creation
+      First_Seq = ALU_Sequence_Item::type_id::create("First_Seq");
+    
+    
+      S_write_exp = new("S_write_exp",this); 
+      m_tlm_fifo  = new ("m_tlm_fifo",this);
+    endfunction
+    
+  function void connect_phase(uvm_phase phase);
+      super.connect_phase(phase);
+    `uvm_info ("Scoreboard" ,"We_Are_Now_In_Scoreboard_Connect_Phase",UVM_NONE)
+    
+    
+      S_write_exp.connect(m_tlm_fifo.analysis_export); 
+    endfunction
+    
+  task run_phase(uvm_phase phase);
+      super.run_phase(phase);
+    `uvm_info ("Scoreboard" ,"We_Are_Now_In_Scoreboard_Run_Phase",UVM_NONE)
+    forever 
+      begin
+        #10;
+	  m_tlm_fifo.get_peek_export.get(First_Seq); 	  
+    if (~ First_Seq.reset)
+      begin
+        if (First_Seq.ALU_Result == 0)
+          $display ("Reset Sequence Pass");
+        else 
+          $display ("Reset Sequence Doesn't pass");
+      end    
+    else if (First_Seq.ALU_Control == 0 && First_Seq.reset)
+      begin
+        if ( (First_Seq.Src_A + First_Seq.Src_B) == First_Seq.ALU_Result)
+          $display ("Addition Pass");
+
+        else 
+          begin
+          $display ("Addition Doesn't pass");
+          $display (First_Seq.Src_A);
+          $display(First_Seq.Src_B);
+          $display(First_Seq.ALU_Result);
+          $display (First_Seq.Src_A + First_Seq.Src_B);
+          end
+
+      end
+    else if (First_Seq.ALU_Control == 1 && First_Seq.reset)
+      begin
+        if ( (First_Seq.Src_A << First_Seq.Src_B) == First_Seq.ALU_Result)
+          $display ("Shift left Pass");
+        else 
+          begin
+          $display ("Shift left Doesn't pass");
+          $display (First_Seq.Src_A);
+          $display(First_Seq.Src_B);
+          $display(First_Seq.ALU_Result);
+          $display (First_Seq.Src_A << First_Seq.Src_B);
+          end
+      end
+    else if (First_Seq.ALU_Control == 2 && First_Seq.reset)
+      begin
+        if ( (First_Seq.Src_A - First_Seq.Src_B) == First_Seq.ALU_Result)
+          $display ("Subtraction Pass");
+        else 
+          begin
+          $display ("Subtraction Doesn't pass");
+          $display (First_Seq.Src_A);
+          $display(First_Seq.Src_B);
+          $display(First_Seq.ALU_Result);
+          $display (First_Seq.Src_A - First_Seq.Src_B);
+          end
+      end
+    else if (First_Seq.ALU_Control == 3 && First_Seq.reset)
+      begin
+        if ( ~(First_Seq.Src_A ^ First_Seq.Src_B) == First_Seq.ALU_Result)
+          $display ("XNOR Pass");
+        else 
+          begin
+          $display ("XNOR Doesn't pass");
+          $display (First_Seq.Src_A);
+          $display(First_Seq.Src_B);
+          $display(First_Seq.ALU_Result);
+          $display (~ (First_Seq.Src_A ^ First_Seq.Src_B));
+          end
+      end
+    else if (First_Seq.ALU_Control == 4 && First_Seq.reset)
+      begin
+        if ( (First_Seq.Src_A ^ First_Seq.Src_B) == First_Seq.ALU_Result)
+          $display ("XOR Pass");
+        else 
+          begin
+          $display ("XOR Doesn't pass");
+          $display (First_Seq.Src_A);
+          $display(First_Seq.Src_B);
+          $display(First_Seq.ALU_Result);
+          $display (First_Seq.Src_A ^ First_Seq.Src_B);
+          end
+      end
+    else if (First_Seq.ALU_Control == 5 && First_Seq.reset)
+      begin
+        if ( (First_Seq.Src_A >> First_Seq.Src_B) == First_Seq.ALU_Result)
+          $display ("Shift Right Pass");
+        else 
+          begin
+          $display ("Shift Right Doesn't pass");
+          $display (First_Seq.Src_A);
+          $display(First_Seq.Src_B);
+          $display(First_Seq.ALU_Result);
+          $display (First_Seq.Src_A >> First_Seq.Src_B);
+          end
+      end
+    else if (First_Seq.ALU_Control == 6 && First_Seq.reset)
+      begin
+        if ( (First_Seq.Src_A | First_Seq.Src_B) == First_Seq.ALU_Result)
+          $display ("OR Pass");
+        else 
+          begin
+          $display ("OR Doesn't pass");
+          $display (First_Seq.Src_A);
+          $display(First_Seq.Src_B);
+          $display(First_Seq.ALU_Result);
+          $display (First_Seq.Src_A | First_Seq.Src_B);
+          end
+      end
+    else if (First_Seq.ALU_Control == 7 && First_Seq.reset)
+      begin
+        if ( (First_Seq.Src_A & First_Seq.Src_B) == First_Seq.ALU_Result)
+          $display ("AND Pass");
+        else 
+          begin
+          $display ("AND Doesn't pass");
+          $display (First_Seq.Src_A);
+          $display(First_Seq.Src_B);
+          $display(First_Seq.ALU_Result);
+          $display (First_Seq.Src_A & First_Seq.Src_B);
+          end
+      end
+      end
+    endtask
+  
+  
+    endclass
+
+
+
+
