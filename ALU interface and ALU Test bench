@@ -1,0 +1,32 @@
+interface ALU_if;	
+  
+  bit [3:0] Src_A;
+  bit [3:0] Src_B;
+  bit [2:0] ALU_Control;
+  bit [3:0] ALU_Result;
+  bit ZF,SF;  
+  bit clk ;
+  bit reset;
+  always  #5 clk = ~clk;  
+
+  
+endinterface 
+
+
+
+module TestBench();
+ `include "uvm_macros.svh"
+  import uvm_pkg ::*; 
+ `include "Pack1.svh"
+  ALU_if intf1();
+
+  My_ALU DUT(intf1.Src_A,intf1.Src_B,intf1.ALU_Control,intf1.clk,intf1.reset,intf1.ALU_Result,intf1.ZF,intf1.SF);
+  initial 
+   begin
+     uvm_config_db #(virtual ALU_if)::set(null,"*","alu_VIF",intf1);
+     run_test("ALU_Test");
+     
+
+    end
+
+endmodule
