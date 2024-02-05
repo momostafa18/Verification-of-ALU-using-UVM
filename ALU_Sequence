@@ -1,0 +1,40 @@
+class ALU_Sequence extends uvm_sequence #(ALU_Sequence_Item);
+
+  ALU_Sequence_Item First_seq ;
+  bit STATUS ;
+  
+  // Factory Registration
+  `uvm_object_utils(ALU_Sequence)
+  
+  //Factory Construction
+  function new (string name = "ALU_Sequence");
+       super.new(name);
+    endfunction
+
+
+  //Prebody Task  
+  task pre_body ;
+    First_seq = ALU_Sequence_Item :: type_id:: create("First_seq");
+  endtask
+
+
+  //Body Task
+  task body;
+
+     //First Sequence
+	 start_item(First_seq);
+	 First_seq.reset = 0;
+	 finish_item(First_seq);
+    
+    
+
+    //Second Sequence
+    for(int i=0;i<8;i++)
+	 begin
+	 start_item(First_seq);
+     First_seq.reset = 1;
+     STATUS = First_seq.randomize(Src_A,Src_B,ALU_Control);
+	 finish_item(First_seq);
+	 end 
+  endtask
+endclass
