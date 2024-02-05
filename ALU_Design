@@ -1,0 +1,39 @@
+module My_ALU (
+  input wire [3:0] Src_A,
+  input wire [3:0] Src_B,
+  input wire [2:0] ALU_Control,
+  input wire clk,
+  input wire reset,
+  output reg [3:0] ALU_Result,
+  output reg ZF,
+  output reg SF
+);
+
+always @(posedge clk or negedge reset)
+begin
+  if (!reset)
+  begin
+    ALU_Result <= 0;
+    ZF <= 1;
+    SF <= 0;
+  end
+  else
+  begin
+    case (ALU_Control)
+      3'b000: ALU_Result <= Src_A + Src_B;
+      3'b001: ALU_Result <= Src_A << Src_B;
+      3'b010: ALU_Result <= Src_A - Src_B;
+      3'b011: ALU_Result <= ~(Src_A ^ Src_B);
+      3'b100: ALU_Result <= Src_A ^ Src_B;
+      3'b101: ALU_Result <= Src_A >> Src_B;
+      3'b110: ALU_Result <= Src_A | Src_B;
+      3'b111: ALU_Result <= Src_A & Src_B;
+      default: ALU_Result <= 0;
+    endcase
+
+    SF <= ALU_Result[3];
+    ZF <= ~(|ALU_Result);
+  end
+end
+
+endmodule
