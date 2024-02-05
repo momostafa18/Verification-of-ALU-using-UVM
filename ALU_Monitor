@@ -1,0 +1,56 @@
+class ALU_Monitor extends uvm_monitor;
+  
+  ALU_Sequence_Item First_Seq;
+  virtual ALU_if intf1 ;
+  uvm_analysis_port #(ALU_Sequence_Item) M_write_port;
+  
+  // Factory Registration
+  `uvm_component_utils(ALU_Monitor)
+  
+  //Factory Construction
+  function new (string name = "ALU_Monitor" , uvm_component parent = null);
+       super.new(name,parent);
+    endfunction
+    
+   //UVM Phases
+  function void build_phase(uvm_phase phase);
+      super.build_phase(phase);
+    `uvm_info ("Monitor" ,"We_Are_Now_In_Monitor_Build_Phase",UVM_NONE)
+      // Factory Creation
+      First_Seq = ALU_Sequence_Item::type_id::create("First_Seq");
+    
+    //DataBase configurations
+    if(!(uvm_config_db#(virtual ALU_if)::get(this,"","alu_VIF",intf1)))
+      `uvm_fatal(get_full_name(),"Error")
+     M_write_port = new("M_write_port",this); 
+    endfunction
+    
+  function void connect_phase(uvm_phase phase);
+      super.connect_phase(phase);
+    `uvm_info ("Monitor" ,"We_Are_Now_In_Monitor_Connect_Phase",UVM_NONE)
+    endfunction
+    
+  task run_phase(uvm_phase phase);
+      super.run_phase(phase);
+    `uvm_info ("Monitor" ,"We_Are_Now_In_Monitor_Run_Phase",UVM_NONE)
+    forever
+      begin
+        @ (negedge intf1.clk);
+         begin
+         First_Seq.Src_A 		    <= intf1.Src_A;
+		 First_Seq.Src_B	 	    <= intf1.Src_B;
+         First_Seq.ALU_Control 	    <= intf1.ALU_Control;
+         First_Seq.clk 			    <= intf1.clk;
+         First_Seq.reset 		    <= intf1.reset;
+		 First_Seq.ALU_Result 	    <= intf1.ALU_Result;
+		 First_Seq.ZF 			    <= intf1.ZF;
+		 First_Seq.SF 			    <= intf1.SF;
+         /*$display("We are in Monitor");
+         $display (First_Seq.Src_A);
+         $display(First_Seq.Src_B);
+         $display(First_Seq.ALU_Result);   */
+         M_write_port.write(First_Seq);         
+         end
+      end
+    endtask
+   endclass 
