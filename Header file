@@ -1,0 +1,15 @@
+
+`include "uvm_macros.svh"
+import uvm_pkg ::*;
+
+`include "UVM_Sequence_Item.svh"
+`include "UVM_Sequence.svh"
+`include "UVM_Sequencer.svh"
+`include "UVM_Driver.svh"
+`include "UVM_Monitor.svh"
+`include "UVM_Agent.svh"
+`include "UVM_Subscriber.svh"
+`include "UVM_Scoreboard.svh"
+`include "UVM_Enviroment.svh"
+`include "UVM_Test.svh"
+
