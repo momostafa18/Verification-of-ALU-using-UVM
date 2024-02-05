@@ -1,0 +1,48 @@
+class ALU_Agent extends uvm_agent;
+  
+  ALU_Driver 	alu_driver;
+  ALU_Monitor 	alu_monitor;
+  ALU_Sequencer	alu_sequencer;
+  virtual ALU_if intf1 ;
+  uvm_analysis_port #(ALU_Sequence_Item) M_write_port;
+  
+  // Factory Registration
+  `uvm_component_utils(ALU_Agent)
+  
+  //Factory Construction
+  function new (string name = "ALU_Agent" , uvm_component parent = null);
+       super.new(name,parent);
+    endfunction
+    
+   //UVM Phases
+  function void build_phase(uvm_phase phase);
+      super.build_phase(phase);
+    `uvm_info ("Agent" ,"We_Are_Now_In_Agent_Build_Phase",UVM_NONE)
+    // Factory Creation
+      alu_driver = ALU_Driver::type_id::create("alu_driver", this);
+      alu_monitor = ALU_Monitor::type_id::create("alu_monitor", this);
+      alu_sequencer = ALU_Sequencer::type_id::create("alu_sequencer", this);
+    
+    
+    //DataBase configurations
+    if(!(uvm_config_db#(virtual ALU_if)::get(this,"","alu_VIF",intf1)))
+      `uvm_fatal(get_full_name(),"Error")
+       
+      uvm_config_db #(virtual ALU_if)::set(this,"ALU_Agent","alu_VIF",intf1);
+    uvm_config_db #(virtual ALU_if)::set(this,"ALU_Monitor","alu_VIF",intf1);
+
+     M_write_port = new("M_write_port",this); 
+    endfunction
+    
+  function void connect_phase(uvm_phase phase);
+      super.connect_phase(phase);
+    `uvm_info ("Agent" ,"We_Are_Now_In_Agent_Connect_Phase",UVM_NONE)
+    alu_driver.seq_item_port.connect(alu_sequencer.seq_item_export);
+    alu_monitor.M_write_port.connect(M_write_port);
+    endfunction
+    
+  task run_phase(uvm_phase phase);
+      super.run_phase(phase);
+    `uvm_info ("Agent" ,"We_Are_Now_In_Agent_Run_Phase",UVM_NONE)
+    endtask
+  endclass  
