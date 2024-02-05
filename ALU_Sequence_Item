@@ -1,0 +1,21 @@
+class ALU_Sequence_Item extends uvm_sequence_item;
+  
+   // Factory Registration
+  `uvm_object_utils(ALU_Sequence_Item)
+  
+  //Factory Construction
+  function new (string name = "ALU_Sequence_Item");
+       super.new(name);
+    endfunction
+  
+  randc bit [3:0] Src_A;
+  randc bit [3:0] Src_B;
+  randc bit [2:0] ALU_Control;
+  bit [3:0] ALU_Result;
+  bit ZF,SF;  
+  bit clk ;
+  bit reset;
+
+  
+  
+endclass
