@@ -1,0 +1,36 @@
+class ALU_Subscriber extends uvm_subscriber #(ALU_Sequence_Item);
+  
+  ALU_Sequence_Item First_Seq;
+  
+  // Factory Registration
+  `uvm_component_utils(ALU_Subscriber)
+  
+  //Factory Construction
+  function new (string name = "ALU_Subscriber" , uvm_component parent = null);
+       super.new(name,parent);
+    endfunction
+    
+   //UVM Phases
+  function void build_phase(uvm_phase phase);
+      super.build_phase(phase);
+    `uvm_info ("Subscriber" ,"We_Are_Now_In_Subscriber_Build_Phase",UVM_NONE)
+    // Factory Creation
+      First_Seq = ALU_Sequence_Item::type_id::create("First_Seq");
+    endfunction
+    
+  function void connect_phase(uvm_phase phase);
+      super.connect_phase(phase);
+    `uvm_info ("Subscriber" ,"We_Are_Now_In_Subscriber_Connect_Phase",UVM_NONE)
+    endfunction
+    
+  task run_phase(uvm_phase phase);
+      super.run_phase(phase);
+    `uvm_info ("Subscriber" ,"We_Are_Now_In_Subscriber_Run_Phase",UVM_NONE)
+    endtask
+  
+  	
+  
+    function void write(ALU_Sequence_Item t);
+      First_Seq = t ;
+	endfunction
+    endclass
